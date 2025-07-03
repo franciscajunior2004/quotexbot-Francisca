@@ -1,6 +1,13 @@
 import time
-from datetime import datetime
 import random
+from datetime import datetime
+from telegram import Bot
+
+# === CONFIGURAÇÕES ===
+TOKEN = '8142431348:AAFV6uxsLAEfmZtmsIfwQR3saWht1k_UjfE'
+CHAT_ID = 6021407119  # ID do teu Telegram @FranciscajuniorId
+
+bot = Bot(token=TOKEN)
 
 # Estratégias simuladas
 def estrategia_rsi():
@@ -20,16 +27,19 @@ def verificar_confluencia():
         "MM20": estrategia_mm20()
     }
     total = sum(sinais.values())
-    return sinais, total >= 2  # pelo menos 2 estratégias concordam
+    return sinais, total >= 2
 
-# Simulador de envio de sinal
+# Enviar sinal via Telegram
 def enviar_sinal(sinais, probabilidade):
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     direcao = random.choice(["CALL", "PUT"])
-    print(f"\n📡 SINAL GERADO [{agora}]")
-    print(f"🎯 Direção: {direcao}")
-    print(f"📊 Estratégias alinhadas: {', '.join([k for k,v in sinais.items() if v])}")
-    print(f"✅ Probabilidade: {probabilidade}%")
+    texto = f"""
+📡 *SINAL GERADO* [{agora}]
+🎯 *Direção:* {direcao}
+📊 *Estratégias:* {', '.join([k for k,v in sinais.items() if v])}
+✅ *Chance de acerto:* {probabilidade}%
+"""
+    bot.send_message(chat_id=CHAT_ID, text=texto, parse_mode="Markdown")
 
 # Loop principal
 while True:
@@ -39,4 +49,4 @@ while True:
         enviar_sinal(sinais, probabilidade)
     else:
         print("⏳ Nenhum sinal confiável. Aguardando...")
-    time.sleep(300)  # Espera 5 minutos (M5)
+    time.sleep(300)  # Espera 5 minutos
